@@ -1,4 +1,5 @@
 using Dapper;
+using FirstCrudinWeb.Filters;
 using FirstCrudinWeb.Models;
 using Npgsql;
 
@@ -6,14 +7,14 @@ namespace FirstCrudinWeb.Services;
 
 public class CategoryService : ICategoryService
 {
-    public IEnumerable<Category> GetAllCategories()
+    public IEnumerable<Category> GetAllCategories(CategoryFilter filter)
     {
         try
         {
             using (NpgsqlConnection connection = new NpgsqlConnection(SqlCommands.ConnectionString))
             {
                 connection.Open();
-                return connection.Query<Category>(SqlCommands.GetAllCategories);
+                return connection.Query<Category>(SqlCommands.GetAllCategories,filter);
             }
         }
         catch (NpgsqlException e)
@@ -98,7 +99,10 @@ file class SqlCommands
     public const string ConnectionString =
         "Server=localhost;Port=5432;Database=web_db;User Id=postgres;Password=123456;";
 
-    public const string GetAllCategories = "SELECT * FROM categories";
+    public const string GetAllCategories = @"
+    SELECT * FROM categories 
+    WHERE (@Name IS NULL OR @Name = '' OR name LIKE '%' || @Name || '%')";
+    
     public const string GetCategoryById = "SELECT * FROM categories WHERE id = @id";
     public const string AddCategory = "INSERT INTO categories (name) VALUES (@name)";
     public const string UpdateCategory = "UPDATE categories SET name = @name WHERE id = @id";
