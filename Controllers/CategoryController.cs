@@ -65,4 +65,18 @@ public class CategoryController : ControllerBase
     {
         return _categoryService.DeleteCategory(id);
     }
+    
+    [HttpOptions]
+    public IActionResult Options()
+    {
+        // Возвращаем заголовки, указывающие поддерживаемые методы
+        Response.Headers.Append("Allow", "GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD");
+        return Ok();
+    }
+    
+    [HttpHead]
+    public IActionResult Head()
+    {
+        return Ok();
+    }
 }
